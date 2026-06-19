@@ -1,0 +1,30 @@
+{
+  "name": "website-backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www -port=3001"
+  },
+  "dependencies": {
+    "body-parser-xml": "^2.0.5",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^17.4.2",
+    "express": "~4.16.1",
+    "express-rate-limit": "^8.5.2",
+    "express-xml-bodyparser": "^0.4.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "mysql2": "^3.22.5",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^3.3.2",
+    "sanitize-html": "^2.17.5",
+    "sequelize": "^6.37.8",
+    "xml-to-json-stream": "^1.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "sequelize-cli": "^6.6.5"
+  }
+}
