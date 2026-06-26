@@ -1,9 +1,9 @@
 const NodeCache = require('node-cache');
-const cache = new NodeCache(); // pass options like { stdTTL: 60, checkperiod: 120 }
+const cache = new NodeCache({ stdTTL: 120, checkperiod: 600 }); // pass options like { stdTTL: 60, checkperiod: 120 }
 
-function cacheMiddleware(options = {}) {
+const cacheMiddleware = (options = {}) => {
   const {
-    ttl = 60,                 // seconds
+    ttl = 120,                 // seconds
     useQuery = true,
     useParams = false,
     useBody = false,
