@@ -328,5 +328,5 @@ module.exports = router;
 /obituary/search?q=edward wilcox
 /obituary/search?last_name=wilcox&born=dec+28+1943
 /obituary/search?death=jun+19+2026
-`/obituary/search?description=body+text&limit=25
+/obituary/search?description=body+text&limit=25
 */
