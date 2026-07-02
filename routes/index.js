@@ -29,6 +29,9 @@ router.get(
         offset = 0
       } = req.query;
 
+      const queryQ = q || name || first_name || last_name || death || born || description || location;
+
+      if (queryQ === undefined || false || null) return res.send({ message: 'No input found' })
       const norm = (s) => (s ?? '').toString().trim().toLowerCase();
 
       const nQ = norm(q);
