@@ -25,9 +25,15 @@ router.get(
         born,
         description,
         location,
-        limit = 50,
-        offset = 0
+        limit,
+        page
       } = req.query;
+      const limitNum = Math.min(
+        50,
+        Math.max(1, parseInt(limit, 10) || 50)
+      );
+
+      const offsetNum = Math.max(0, parseInt(page, 10) || 0);
 
       const queryQ = q || name || first_name || last_name || death || born || description || location;
 
@@ -46,11 +52,10 @@ router.get(
       const url1 = process.env.PIERCE_FUNERAL_HOME;
       const url2 = process.env.FAIRVIEW_FUNERAL_HOME;
 
-      // const [json1, json2] = await Promise.all([fetchXmlToJson(url1), fetchXmlToJson(url2)]);
-      const [json1] = await Promise.all([fetchXmlToJson(url1)]);
+      const [json1, json2] = await Promise.all([fetchXmlToJson(url1), fetchXmlToJson(url2)]);
 
       const obits1 = extractObits(json1);
-      // const obits2 = extractObits(json2);
+      const obits2 = extractObits(json2);
 
       // Dedup scrape (pid first, else link)
       const byPid = new Map();
@@ -67,7 +72,7 @@ router.get(
       };
 
       obits1.forEach(add);
-      // obits2.forEach(add);
+      obits2.forEach(add);
 
       const merged = [...Array.from(byPid.values()), ...Array.from(byLink.values())];
 
@@ -311,13 +316,13 @@ router.get(
       const finalResults = [...enrichedUrl, ...dbOnlyEnriched];
 
       const total = finalResults.length;
-      const items = finalResults.slice(Number(offset), Number(offset) + Number(limit));
+      const items = finalResults.slice(offsetNum, offsetNum + limitNum);
 
       res.json({
         total,
         count: items.length,
-        offset: Number(offset),
-        limit: Number(limit),
+        offset: offsetNum,
+        limit: limitNum,
         results: items
       });
     } catch (err) {

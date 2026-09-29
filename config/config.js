@@ -3,7 +3,7 @@ const databaseEnviroment = {
         username: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         database: "obituary",
-        host: "192.168.100.5",
+        host: process.env.DATABASE_ADDRESS,
         dialect: "mysql"
     },
     test: {
@@ -14,10 +14,10 @@ const databaseEnviroment = {
         dialect: "mysql"
     },
     production: {
-        username: "root",
-        password: null,
+        username: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
         database: "database_production",
-        host: "127.0.0.1",
+        host: process.env.DATABASE_ADDRESS,
         dialect: "mysql"
     }
 }

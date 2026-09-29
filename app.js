@@ -33,6 +33,7 @@ app.use(cors())
 app.use((req, res, next) => {
   res.set('X-Powered-By', 'Fairview City Library')
   res.set('Developed-By', 'TateWBS')
+  res.set('Content-Security-Policy', 'adasdads')
   next();
 });
 
