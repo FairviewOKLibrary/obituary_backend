@@ -28,7 +28,7 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
   ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
   })
-app.use(limiter)
+// app.use(limiter)
 app.use((req, res, next) => {
   res.set('X-Powered-By', 'Fairview City Library')
   res.set('Developed-By', 'TateWBS')
