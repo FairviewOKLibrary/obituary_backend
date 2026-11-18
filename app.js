@@ -1,60 +1,35 @@
-const createError = require('http-errors');
+'use strict';
 const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const xmlparser = require('express-xml-bodyparser');
-const rateLimit = require('express-rate-limit')
-const cors = require('cors')
-
-
-
-const indexRouter = require('./routes/index');
-
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const router = require('./routes');
 const app = express();
 
-app.use(cors())
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(xmlparser({ limit: '1mb', explicitArray: false }));
-app.set('trust proxy', 1);
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-  standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-  ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
-  })
-// app.use(limiter)
-app.use((req, res, next) => {
-  res.set('X-Powered-By', 'Fairview City Library')
-  res.set('Developed-By', 'TateWBS')
-  res.set('Content-Security-Policy', 'adasdads')
+app.disable('x-powered-by');
+if (process.env.TRUST_PROXY === 'true') app.set('trust proxy', 1);
+if (process.env.FRONTEND_ORIGIN) {
+  const origins = process.env.FRONTEND_ORIGIN.split(',').map(value => value.trim());
+  app.use(cors({ origin: origins }));
+}
+app.use(logger(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use((_req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
   next();
 });
-
-
-app.use('/', indexRouter);
-
-
-
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  next(createError(404));
+app.use('/obituary', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 180,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+}));
+app.use(router);
+app.use((_req, res) => res.status(404).json({ message: 'Endpoint not found.' }));
+app.use((error, _req, res, _next) => {
+  const status = error.status && error.status >= 400 && error.status < 500 ? error.status : 500;
+  if (status === 500) console.error('API error:', error);
+  res.status(status).json({ message: status === 500 ? 'An unexpected error occurred.' : error.message });
 });
-
-// error handler
-app.use((err, req, res, next) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.json({ message: err.message });
-});
-
 module.exports = app;
