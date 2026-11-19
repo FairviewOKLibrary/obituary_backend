@@ -47,3 +47,17 @@ test('different namesakes are not merged without matching dates', () => {
   assert.ok(samePerson(notice, { person: 'Alex Example', death: 'May 22 2024' }));
   assert.ok(!samePerson(notice, { person: 'Alex Example', death: '2023' }));
 });
+
+test('both archive records and funeral-home notices return cleaned multi-paragraph text', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const raw = fs.readFileSync(path.join(__dirname, 'fixtures/encoded-obituary.txt'), 'utf8');
+  const archive = normalizeArchiveRecord({ id: 21, person: 'Shirley Mae Epps Jones', text: raw });
+  const notice = normalizeFeedRecord({ pid: '21', person: 'Shirley Mae Epps Jones', text: raw });
+  for (const record of [archive, notice]) {
+    assert.equal(record.text.split('\n\n').length, 5);
+    assert.match(record.text, /element—visiting with customers/);
+    assert.match(record.text, /Shirley’s wishes/);
+    assert.doesNotMatch(record.text, /style=|<span|&lt;/i);
+  }
+});

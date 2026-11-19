@@ -1,7 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
-const sanitizeHtml = require('sanitize-html');
+const { obituaryToPlainText } = require('./plainText');
 const { Op } = require('sequelize');
 
 const TEXT_FIELDS = ['q', 'name', 'first_name', 'last_name', 'born', 'death', 'description', 'location'];
@@ -9,8 +9,7 @@ const MAX_QUERY_LENGTH = 120;
 const MAX_LIMIT = 48;
 const clean = (value, maxLength = 2000) => {
   if (value === undefined || value === null) return '';
-  const str = typeof value === 'string' || typeof value === 'number' ? String(value) : '';
-  return sanitizeHtml(str, { allowedTags: [], allowedAttributes: {} })
+  return obituaryToPlainText(value, maxLength * 4)
     .replace(/\s+/g, ' ').trim().slice(0, maxLength);
 };
 const norm = (value) => String(value ?? '').trim().toLocaleLowerCase('en-US');
@@ -67,7 +66,7 @@ function normalizeFeedRecord(record) {
     pid: pid || null, person, first_name, last_name,
     birth: birth || null, death: death || null,
     maiden_name: clean(record.maiden_name ?? record.maidenName, 140) || null,
-    text: clean(record.text ?? record.description, 5000) || null,
+    text: obituaryToPlainText(record.text ?? record.description, 30000) || null,
     location: clean(record.location, 300) || null,
     thumbnail: validExternalUrl(record.thumbnail),
     link,
@@ -84,7 +83,7 @@ function normalizeArchiveRecord(record) {
     birth: clean(record.born, 100) || null,
     death: clean(record.death, 100) || null,
     maiden_name: clean(record.maiden_name, 140) || null,
-    text: clean(record.text, 5000) || null,
+    text: obituaryToPlainText(record.text, 30000) || null,
     location: null,
     thumbnail: null,
     link: null,
