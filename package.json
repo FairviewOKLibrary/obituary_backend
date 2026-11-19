@@ -16,7 +16,7 @@
     "morgan": "~1.9.1",
     "mysql2": "^3.22.5",
     "node-cache": "^5.1.2",
-    "sanitize-html": "^2.17.5",
+    "sanitize-html": "^2.18.2",
     "sequelize": "^6.37.8",
     "xml-to-json-stream": "^1.1.0"
   },

@@ -4,6 +4,7 @@ const { cacheMiddleware } = require('../libs/cache');
 const { getNotices } = require('../libs/feedService');
 const models = require('../models');
 const { Op } = require('sequelize');
+const sanitizeHtml = require('sanitize-html');
 const { norm, parseSearch, matchesNotice, makeArchiveWhere, samePerson, normalizeArchiveRecord } = require('../libs/search');
 const router = express.Router();
 
@@ -41,7 +42,7 @@ router.get('/obituary/search', cacheMiddleware({ ttl: 90 }), async (req, res, ne
             byName.get(key).push(notice);
           }
           excludedIds = collisions.filter(db => {
-            const matchingNotice = (byName.get(norm(db.person)) || []).find(notice => samePerson(notice, db));
+            const matchingNotice = sanitizeHtml((byName.get(norm(db.person)) || []).find(notice => samePerson(notice, db)));
             if (!matchingNotice) return false;
             const archive = normalizeArchiveRecord(db);
             // Keep unique notices, but retain useful archival details if the notice is incomplete.

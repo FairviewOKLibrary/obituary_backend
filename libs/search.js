@@ -143,7 +143,7 @@ function makeArchiveWhere(filters, excludedIds = []) {
   const terms = [];
   if (filters.q) {
     for (const token of filters.q.split(/\s+/).slice(0, 8)) {
-      terms.push({ [Op.or]: ['person','first_name','last_name','maiden_name','text','born','death'].map(field => ({ [field]: sqlContains(token) })) });
+      terms.push({ [Op.or]: ['person', 'first_name', 'last_name', 'maiden_name', 'text', 'born', 'death'].map(field => ({ [field]: sqlContains(token) })) });
     }
   }
   if (filters.name) terms.push({ person: sqlContains(filters.name) });
